@@ -4,6 +4,7 @@ import router from "next/router";
 import Image from "next/image";
 import checkAuth from "../../checkAuth";
 import useCheckAuth from "../../checkAuth";
+import { auth } from "../../firebase";
 
 export default function AdminPage() {
 
@@ -25,6 +26,7 @@ export default function AdminPage() {
           await loginAdmin(username, password);
 
           console.log("Login successful");
+          
           setFailureState(false); // Reset failure state
           router.push('/admin/dashboard');
 

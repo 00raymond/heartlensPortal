@@ -16,6 +16,26 @@ const logout = async () => {
     }
 };
 
+const registerAdmin = async (email: string, password: string, name: string) => {
+    try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const uid = userCredential.user.uid;
+        const userData = {
+            userType: 'admin',
+            name: name,
+            isAdmin: true,
+            isDoc: false,
+            isPatient: false,
+        };
+
+        await setDoc(doc(db, 'users', uid), userData);
+
+        console.log('Admin registered and data added to Firestore');
+    } catch (error) {
+        console.error('Error registering user:', error);
+    }
+}
+
 const registerDoctor = async (email: string, password: string, name:string) => {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -50,25 +70,23 @@ const registerPatient = async (email: string, password: string, docId: string, n
 
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const uid = userCredential.user.uid;
-      const docData = (await getDoc(docRef)).data();
-      const docEmail = docData ? docData.docEmail : null;
       
       const userData = {
-          userType: 'patient',
-          name: name,
-          isAdmin: false,
-          isDoc: false,
-          isPatient: true,
-          patientEmail: email,
-          docEmail: docEmail,
-          docId: docId,
-          additionalInfo: additionalInfo,
+        userType: 'patient',
+        name: name,
+        isAdmin: false,
+        isDoc: false,
+        isPatient: true,
+        patientEmail: email,
+        docEmail: null,
+        docId: uid,
+        additionalInfo: additionalInfo,
       };
   
-      // Add user data to Firestore
       await setDoc(doc(db, 'users', uid), userData);
   
       console.log('User registered and data added to Firestore');
+      await auth.signOut();
     } catch (error) {
       console.error('Error registering user:', error);
     }
@@ -143,4 +161,4 @@ const getUsersByType = async (userType: string): Promise<UserDataInterface[]> =>
   };
 
 // Example usage
-export { auth, logout, registerPatient, registerDoctor, loginAdmin, loginDoctor, getUsersByType };
+export { auth, logout, registerPatient, registerDoctor, loginAdmin, loginDoctor, getUsersByType, registerAdmin };
