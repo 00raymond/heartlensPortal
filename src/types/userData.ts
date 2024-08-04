@@ -1,8 +1,12 @@
-export const userData = {
-    userType: 'admin', // or 'doctor' or 'patient'
-    isAdmin: true,
-    isDoc: false,
-    isPatient: false,
-    docEmail: null,
-    patientIds: [],
-};
+export interface UserDataInterface {
+    userType: string;
+    uid: string;
+    name: string;
+    isAdmin: boolean;
+    isDoc: boolean;
+    isPatient: boolean;
+    patientEmail?: string;
+    docEmail?: string;
+    docId?: string;
+    additionalInfo?: string;
+}

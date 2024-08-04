@@ -1,9 +1,20 @@
 
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { collection, doc, getDoc, getDocs, query, setDoc, where } from 'firebase/firestore';
 import { db } from './firebaseConfig';
+import { UserDataInterface } from '@/types/userData';
+import { get } from 'http';
 
 const auth = getAuth();
+
+const logout = async () => {
+    try {
+        await signOut(auth);
+        console.log('User signed out');
+    } catch (error) {
+        console.error('Error signing out:', error);
+    }
+};
 
 const registerDoctor = async (email: string, password: string, name:string) => {
   try {
@@ -39,6 +50,9 @@ const registerPatient = async (email: string, password: string, docId: string, n
 
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const uid = userCredential.user.uid;
+      const docData = (await getDoc(docRef)).data();
+      const docEmail = docData ? docData.docEmail : null;
+      
       const userData = {
           userType: 'patient',
           name: name,
@@ -46,7 +60,7 @@ const registerPatient = async (email: string, password: string, docId: string, n
           isDoc: false,
           isPatient: true,
           patientEmail: email,
-          docEmail: docRef,
+          docEmail: docEmail,
           docId: docId,
           additionalInfo: additionalInfo,
       };
@@ -101,6 +115,32 @@ const loginAdmin = async (email: string, password: string) => {
       }
 }
 
+const getUsersByType = async (userType: string): Promise<UserDataInterface[]> => {
+    try {
+      // Reference to the 'users' collection
+      const usersCollectionRef = collection(db, 'users');
+  
+      // Query the collection where userType matches the specified value
+      const q = query(usersCollectionRef, where('userType', '==', userType));
+  
+      // Execute the query
+      const querySnapshot = await getDocs(q);
+  
+      // Parse the results
+      const users: UserDataInterface[] = querySnapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          ...data,
+          uid: doc.id, // Include the UID from the document ID
+        } as UserDataInterface; // Cast to UserDataInterface
+      });
+  
+      return users;
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      throw new Error('Failed to fetch users by type');
+    }
+  };
 
 // Example usage
-export { auth, registerPatient, registerDoctor, loginAdmin, loginDoctor };
+export { auth, logout, registerPatient, registerDoctor, loginAdmin, loginDoctor, getUsersByType };
