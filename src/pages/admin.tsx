@@ -45,7 +45,7 @@ export default function AdminPage() {
             {/* password input, make it setpassword */}
             <input type="password" className="text-black w-72 p-2 rounded-xl" placeholder="Password" onChange={(e) => setPassword(e.target.value)} />
             {/* login button */}
-            <button onClick={login} className="p-2 border-xl border-white border-2 rounded-xl hover:bg-opacity-25 hover:bg-white transition-all duration-200">Login</button>
+            {<button onClick={login} className="p-2 border-xl border-white border-2 rounded-xl hover:bg-opacity-25 hover:bg-white transition-all duration-200">Login</button>}
             {/* if login fails, show this */}
             {failureState && <p className="text-red-400">Invalid username or password</p>}
         </div>

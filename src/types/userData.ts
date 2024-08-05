@@ -8,5 +8,6 @@ export interface UserDataInterface {
     email?: string;
     parentEmail?: string;
     parentId?: string;
+    isActive: true;
     additionalInfo?: string;
 }

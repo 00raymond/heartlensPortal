@@ -64,6 +64,7 @@ const registerDoctor = async (email: string, password: string, name:string, pare
         isAdmin: false,
         isDoc: true,
         isPatient: false,
+        isActive: true,
         email: email,
         parentEmail: parentEmail,
         patientIds: [],
@@ -73,7 +74,7 @@ const registerDoctor = async (email: string, password: string, name:string, pare
     await setDoc(doc(db, 'users', uid), userData);
 
     console.log('Doctor registered and data added to Firestore');
-    
+
     await auth.signOut();
   } catch (error) {
     console.error('Error registering user:', error);
@@ -111,6 +112,7 @@ const registerPatient = async (email: string, password: string, parentId: string
         email: email,
         parentEmail: docEmail,
         parentId: parentId,
+        isActive: true,
         additionalInfo: additionalInfo,
       };
   
@@ -123,27 +125,26 @@ const registerPatient = async (email: string, password: string, parentId: string
     }
 }
 
-const disableAccount = async (uid: string) => {
-  try {
-      // Reference to the user document
+const toggleUserActivity = async (uid: string) => {
+    try {
       const userDocRef = doc(db, 'users', uid);
-
-      // Fetch the user document
       const userDoc = await getDoc(userDocRef);
-
+  
       if (!userDoc.exists()) {
-          console.error('No such document!');
-          return;
+        console.error('No such document!');
+        return;
       }
-
-      // Update the user document
-      await setDoc(userDocRef, { disabled: true }, { merge: true });
-
-      console.log('User account disabled successfully');
-  } catch (error) {
-      console.error('Error disabling account:', error);
-  }
-}
+  
+      const userData = userDoc.data();
+      const isActive = userData.isActive;
+  
+      await setDoc(userDocRef, { isActive: !isActive }, { merge: true });
+  
+      console.log('User activity status updated');
+    } catch (error) {
+      console.error('Error updating user activity status:', error);
+    }
+};
 
 const loginDoctor = async (email: string, password: string) => {
     // check if email exists
@@ -214,4 +215,4 @@ const getUsersByType = async (userType: string): Promise<UserDataInterface[]> =>
   };
 
 // Example usage
-export { auth, logout, registerPatient, registerDoctor, loginAdmin, loginDoctor, getUsersByType, registerAdmin };
+export { auth, logout, registerPatient, registerDoctor, loginAdmin, loginDoctor, getUsersByType, registerAdmin, toggleUserActivity };
