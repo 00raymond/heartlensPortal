@@ -8,9 +8,9 @@ interface CreateUserProps {
 
 export default function CreateUser(props: CreateUserProps) {
 
-    const doctorNameRef = useRef(null);
-    const doctorEmailRef = useRef(null);
-    const doctorPasswordRef = useRef(null);
+    const doctorNameRef = useRef<HTMLInputElement>(null);
+    const doctorEmailRef = useRef<HTMLInputElement>(null);
+    const doctorPasswordRef = useRef<HTMLInputElement>(null);
 
     const patientNameRef = useRef<HTMLInputElement>(null);
     const patientEmailRef = useRef<HTMLInputElement>(null);
@@ -30,14 +30,23 @@ export default function CreateUser(props: CreateUserProps) {
         registerAdmin(email, password, name);
     }
 
-    const registerDoctorDb = async (email: string, password: string, name: string) => {
+    const registerDoctorDb = async () => {
+
+        let email = doctorEmailRef.current?.value;
+        let password = doctorPasswordRef.current?.value;
+        let name = doctorNameRef.current?.value;
 
         if (auth.currentUser == null) { console.log('Error: Admin not authenticated. Please re-login.'); return; }
 
         if (email == null || password == null || name == null) { console.log('Error: Missing required fields.'); return; }
+        if (email == "" || password == "" || name == "" ) { 
+            console.log('Error: Missing required fields.'); 
+            return; 
+        }
 
+        let parentId = auth.currentUser?.uid;
 
-        registerDoctor(email, password, name);
+        registerDoctor(email, password, name, parentId);
 
     }
 
@@ -47,12 +56,12 @@ export default function CreateUser(props: CreateUserProps) {
         let name = patientNameRef.current?.value;
         let additionalInfo = patientAdditionalInfoRef.current?.value;
 
-        if (email == null || password == null || name == null || additionalInfo == null ) { 
+        if (email == null || password == null || name == null || additionalInfo == null) { 
             console.log('Error: Missing required fields.'); 
             return; 
         }
 
-        if (email == "" || password == "" || name == "" || additionalInfo == "" ) { 
+        if (email == "" || password == "" || name == "" ) { 
             console.log('Error: Missing required fields.'); 
             return; 
         }
@@ -74,7 +83,7 @@ export default function CreateUser(props: CreateUserProps) {
                     <input type="text" placeholder="Name" className="text-black p-2 rounded-lg" ref={doctorNameRef} />
                     <input type="email" placeholder="Email" className="text-black p-2 rounded-lg" ref={doctorEmailRef} />
                     <input type="password" placeholder="Temporary Password" className="text-black p-2 rounded-lg" ref={doctorPasswordRef} />
-                    <button>Register</button>
+                    <button onClick={registerDoctorDb}>Register</button>
                 </div>
             );
         case 'patient':

@@ -36,17 +36,36 @@ const registerAdmin = async (email: string, password: string, name: string) => {
     }
 }
 
-const registerDoctor = async (email: string, password: string, name:string) => {
+const registerDoctor = async (email: string, password: string, name:string, parentId:string) => {
   try {
+
+    const parentRef = doc(db, 'users', parentId);
+    if (parentRef==null) {
+        console.error('Doctor does not exist');
+        return;
+    }
+
+    let parentEmail = null;
+
+    const parentDoc = await getDoc(parentRef);
+    if (!parentDoc.exists()) {
+        console.error('No such document!');
+        return;
+    } else {
+        parentEmail = parentDoc.data().email;
+    }
+
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const uid = userCredential.user.uid;
+
     const userData = {
         userType: 'doctor',
         name: name,
         isAdmin: false,
         isDoc: true,
         isPatient: false,
-        docEmail: email,
+        email: email,
+        parentEmail: parentEmail,
         patientIds: [],
     };
 
@@ -54,32 +73,12 @@ const registerDoctor = async (email: string, password: string, name:string) => {
     await setDoc(doc(db, 'users', uid), userData);
 
     console.log('Doctor registered and data added to Firestore');
+    
+    await auth.signOut();
   } catch (error) {
     console.error('Error registering user:', error);
   }
 };
-
-const disableAccount = async (uid: string) => {
-    try {
-        // Reference to the user document
-        const userDocRef = doc(db, 'users', uid);
-
-        // Fetch the user document
-        const userDoc = await getDoc(userDocRef);
-
-        if (!userDoc.exists()) {
-            console.error('No such document!');
-            return;
-        }
-
-        // Update the user document
-        await setDoc(userDocRef, { disabled: true }, { merge: true });
-
-        console.log('User account disabled successfully');
-    } catch (error) {
-        console.error('Error disabling account:', error);
-    }
-}
 
 const registerPatient = async (email: string, password: string, parentId: string, name: string, additionalInfo: string) => {
     try {
@@ -122,6 +121,28 @@ const registerPatient = async (email: string, password: string, parentId: string
     } catch (error) {
       console.error('Error registering user:', error);
     }
+}
+
+const disableAccount = async (uid: string) => {
+  try {
+      // Reference to the user document
+      const userDocRef = doc(db, 'users', uid);
+
+      // Fetch the user document
+      const userDoc = await getDoc(userDocRef);
+
+      if (!userDoc.exists()) {
+          console.error('No such document!');
+          return;
+      }
+
+      // Update the user document
+      await setDoc(userDocRef, { disabled: true }, { merge: true });
+
+      console.log('User account disabled successfully');
+  } catch (error) {
+      console.error('Error disabling account:', error);
+  }
 }
 
 const loginDoctor = async (email: string, password: string) => {
