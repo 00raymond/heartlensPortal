@@ -48,12 +48,11 @@ const UserList: React.FC<UserListProps> = (props) => {
           <h1>No users found</h1>
         ) : (
           filteredUsers.map((user) => (
-            <div key={user.uid} className="flex flex-row space-x-4">
+            <div key={user.uid} className="flex flex-row space-x-4 bg-white bg-opacity-20 p-2 rounded-xl">
               <p>{user.name}</p>
-              <p>{user.userType}</p>
-              {user.isDoc && <p>User Email: {user.docEmail}</p>}
-              {user.isPatient && <p>Doctor's Email: {user.docEmail}</p>}
-              {user.isPatient && <p>User's Email: {user.patientEmail}</p>}
+              {user.isDoc && <p>Email: {user.email}</p>}
+              {user.isPatient && <p>Doctor's Email: {user.parentEmail} </p>}
+              {user.isPatient && <p>Patient's Email: {user.email}</p>}
             </div>
           ))
         )}

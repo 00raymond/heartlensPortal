@@ -59,13 +59,45 @@ const registerDoctor = async (email: string, password: string, name:string) => {
   }
 };
 
-const registerPatient = async (email: string, password: string, docId: string, name: string, additionalInfo: string) => {
+const disableAccount = async (uid: string) => {
+    try {
+        // Reference to the user document
+        const userDocRef = doc(db, 'users', uid);
+
+        // Fetch the user document
+        const userDoc = await getDoc(userDocRef);
+
+        if (!userDoc.exists()) {
+            console.error('No such document!');
+            return;
+        }
+
+        // Update the user document
+        await setDoc(userDocRef, { disabled: true }, { merge: true });
+
+        console.log('User account disabled successfully');
+    } catch (error) {
+        console.error('Error disabling account:', error);
+    }
+}
+
+const registerPatient = async (email: string, password: string, parentId: string, name: string, additionalInfo: string) => {
     try {
         // search for the doctor's email
-        const docRef = doc(db, 'users', docId);
+        const docRef = doc(db, 'users', parentId);
         if (docRef==null) {
             console.error('Doctor does not exist');
             return;
+        }
+
+        let docEmail = null;
+
+        // get docEmail
+        const docData = await getDoc(docRef);
+        if (!docData.exists()) {
+            console.error('No such document!');
+        } else {
+          docEmail = docData.data().email;
         }
 
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -77,9 +109,9 @@ const registerPatient = async (email: string, password: string, docId: string, n
         isAdmin: false,
         isDoc: false,
         isPatient: true,
-        patientEmail: email,
-        docEmail: null,
-        docId: uid,
+        email: email,
+        parentEmail: docEmail,
+        parentId: parentId,
         additionalInfo: additionalInfo,
       };
   

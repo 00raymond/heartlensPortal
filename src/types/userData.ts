@@ -5,8 +5,8 @@ export interface UserDataInterface {
     isAdmin: boolean;
     isDoc: boolean;
     isPatient: boolean;
-    patientEmail?: string;
-    docEmail?: string;
-    docId?: string;
+    email?: string;
+    parentEmail?: string;
+    parentId?: string;
     additionalInfo?: string;
 }
