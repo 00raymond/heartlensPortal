@@ -223,4 +223,19 @@ const getUsersByType = async (userType: string): Promise<UserDataInterface[]> =>
     }
   };
 
+  export const getUserData = async (uid: string) => {
+    try {
+      const userDocRef =  doc(db, 'users', uid);
+      const userDoc = await getDoc(userDocRef);
+      if (userDoc !== null && userDoc.exists()) {
+        return userDoc.data().data; // Assuming 'data' is the key that holds the array of user data objects
+      } else {
+        throw new Error('User data does not exist');
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      throw error;
+    }
+  };
+
 export { auth, logout, registerPatient, registerDoctor, loginAdmin, loginDoctor, getUsersByType, registerAdmin, toggleUserActivity };
