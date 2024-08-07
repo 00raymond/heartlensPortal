@@ -1,6 +1,6 @@
 # HeartLens
 
-Flutter project aimed at helping people identify heart arrythmias all at home, using phone camera based photoplethysmography and machine learning.
+Next.js and Flutter project aimed at helping people identify heart arrythmias all at home, using phone camera based photoplethysmography and machine learning.
 
 This repository is the **web app** component of the HeartLens project. Ther web app is designed to allow doctors and admins to moderate patients as well as manage their data and perform various evaluations on them. Currently, an arrhythmia-detecting machine learning model exists for doctors to utilize. Patients can sign in and upload their data to the cloud using the mobile app which can be found [here](https://github.com/00raymond/heartlensPortal).
 
