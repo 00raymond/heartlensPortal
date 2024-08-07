@@ -3,10 +3,10 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, si
 import { collection, doc, getDoc, getDocs, query, setDoc, where } from 'firebase/firestore';
 import { db } from './firebaseConfig';
 import { UserDataInterface } from '@/types/userData';
-import { get } from 'http';
 
 const auth = getAuth();
 
+/// Logs the user out
 const logout = async () => {
     try {
         await signOut(auth);
@@ -16,6 +16,8 @@ const logout = async () => {
     }
 };
 
+
+/// Registers an admin user
 const registerAdmin = async (email: string, password: string, name: string) => {
     try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -36,6 +38,7 @@ const registerAdmin = async (email: string, password: string, name: string) => {
     }
 }
 
+/// Registers a doctor user with the given email, password, name, and parent ID of who created it
 const registerDoctor = async (email: string, password: string, name:string, parentId:string) => {
   try {
 
@@ -81,10 +84,12 @@ const registerDoctor = async (email: string, password: string, name:string, pare
   }
 };
 
+/// Registers a patient user with the given email, password, parent ID, name, and additional info
 const registerPatient = async (email: string, password: string, parentId: string, name: string, additionalInfo: string) => {
     try {
         // search for the doctor's email
         const docRef = doc(db, 'users', parentId);
+        
         if (docRef==null) {
             console.error('Doctor does not exist');
             return;
@@ -125,6 +130,7 @@ const registerPatient = async (email: string, password: string, parentId: string
     }
 }
 
+/// Toggles the user activity status. Disables the user if active, enables the user if disabled
 const toggleUserActivity = async (uid: string) => {
     try {
       const userDocRef = doc(db, 'users', uid);
@@ -146,6 +152,7 @@ const toggleUserActivity = async (uid: string) => {
     }
 };
 
+/// Logs in a doctor user with the given email and password, checking if their userType is doctor
 const loginDoctor = async (email: string, password: string) => {
     // check if email exists
     // check if email is a doctor
@@ -153,6 +160,7 @@ const loginDoctor = async (email: string, password: string) => {
     // authenticate, redirect to doctor page. ensure page is only accessible to doctors
 }
 
+/// Logs in an admin user with the given email and password, checking if their userType is admin
 const loginAdmin = async (email: string, password: string) => {
     try {
         // Sign in the user
@@ -187,6 +195,7 @@ const loginAdmin = async (email: string, password: string) => {
       }
 }
 
+/// Fetches users by their userType
 const getUsersByType = async (userType: string): Promise<UserDataInterface[]> => {
     try {
       // Reference to the 'users' collection
@@ -214,5 +223,4 @@ const getUsersByType = async (userType: string): Promise<UserDataInterface[]> =>
     }
   };
 
-// Example usage
 export { auth, logout, registerPatient, registerDoctor, loginAdmin, loginDoctor, getUsersByType, registerAdmin, toggleUserActivity };
